@@ -10,6 +10,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 public class UsuarioDao {
     private static UsuarioDao dao;
    Mongo client;
+   MongoClientURI uri;
     
     DB db;
     
@@ -31,9 +34,9 @@ public class UsuarioDao {
     }
     
       private UsuarioDao() throws UnknownHostException{
-      //   uri  = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
-         client = new Mongo("localhost",27017);
-         db = client.getDB("clinica");
+        uri  = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
+         client = new MongoClient(uri);
+         db = client.getDB("arsad");
     }
       
       //Login
