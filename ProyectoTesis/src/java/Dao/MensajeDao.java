@@ -1,11 +1,12 @@
 
 package Dao;
-
-
+import b
+import com.mongodb.MongoCollection
+import com.mongodb.MongoURI
 import Principal.Mensaje;
 import Principal.Usuario;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
+import org.bson.Document;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -22,8 +23,8 @@ import java.util.List;
 public class MensajeDao {
     private static MensajeDao dao= null;
     private static  MongoClient client;
-     ;
-    private static DB db;
+    private static MongoURI uri ;
+    private static MongoDatabase db;
     
     
     
@@ -35,22 +36,23 @@ public class MensajeDao {
     }
     
       private MensajeDao() throws UnknownHostException{
-        client = new MongoClient("localhost",27017);
-         db = client.getDB("clinica");
-    
+        uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
+        client = new MongoClient(uri);
+        db = new MongoDatabase(client.getDatabase("arsad"));
+
       }
 
       
     
   public List<Mensaje> retrievePorUsuario(Usuario usu){
-       DBCollection mensajeCol = db.getCollection("mensaje");
+       MongoCollection<Document> mensajeCol = db.getCollection("mensaje");
         
-        DBCursor cursor = mensajeCol.find();
+        MongoCursor<Document> cursor = mensajeCol.find();
         
         List<Mensaje> mensajes = new ArrayList<>();
          try{
             while (cursor.hasNext()){
-                DBObject mensajeDoc = cursor.next();
+                Document mensajeDoc = cursor.next();
                 if(usu.getNombre().equals(mensajeDoc.get("nombrePaciente").toString())){
                 Mensaje mensaje = new Mensaje(mensajeDoc.get("mensaje").toString(), mensajeDoc.get("termino").toString(), mensajeDoc.get("nombrePaciente").toString(),mensajeDoc.get("hora").toString());
                 
