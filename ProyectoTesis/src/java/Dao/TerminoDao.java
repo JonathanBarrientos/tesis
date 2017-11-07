@@ -2,24 +2,32 @@
 
 package Dao;
 
+
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.ServerAddress;
+
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+
 import com.datumbox.opensource.classifiers.NaiveBayes;
 import com.datumbox.opensource.dataobjects.NaiveBayesKnowledgeBase;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
+
+
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class TerminoDao {
-        private static TerminoDao dao= null;
+    private static TerminoDao dao= null;
     private static  MongoClient client;
-   
-    private static DB db;
+    private static MongoClientURI uri;
+    private static MongoDatabase db;
     
     
     public static TerminoDao getInstance() throws UnknownHostException{
@@ -30,8 +38,12 @@ public class TerminoDao {
     }
     
       private TerminoDao() throws UnknownHostException{
-     client = new MongoClient("localhost",27017);
-         db = client.getDB("clinica");
+    //    client = new MongoClient("localhost",27017);
+     //    db = client.getDB("clinica");
+        uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
+        client = new MongoClient(uri);
+        db = new MongoDatabase(client.getDatabase("arsad"));
+
       }
     
     
@@ -40,13 +52,13 @@ public class TerminoDao {
       public String SacarTermino(String men,String tiempo, String dolor){
           
            Map<String, String[]> trainingFiles = new HashMap<>();
-           DBCollection terminoCol = db.getCollection("terminos");
-           DBCursor cursor= terminoCol.find();
+           MongoCollection<Document> terminoCol = db.getCollection("terminos");
+           MongoCursor<Document> cursor= terminoCol.find();
            String term;
            
             try{
             while (cursor.hasNext()){
-                DBObject termino = cursor.next();
+                Document termino = cursor.next();
                 if(termino.get("categoriaTiempo").equals(tiempo) && termino.get("categoriaDolor").equals(dolor)){
                 trainingFiles.put(termino.get("termino").toString(), termino.get("significado").toString().split(""));
                  }
@@ -74,8 +86,8 @@ public class TerminoDao {
          
       }
       public void InsertarTermino(String termino, String significado, String tiempo , String dolor){
-          DBCollection terminoCol = db.getCollection("terminos");
-           DBObject ter = new BasicDBObject()
+           MongoCollection<Document> terminoCol = db.getCollection("terminos");
+           Document ter = new Document()
                 .append("termino", termino)
                 .append("significado", significado)
                 .append("categoriaTiempo", tiempo)

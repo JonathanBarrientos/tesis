@@ -1,8 +1,10 @@
 
 package Dao;
-import b
-import com.mongodb.MongoCollection
-import com.mongodb.MongoURI
+
+import com.mongodb.client.MongoCursor;
+
+import com.mongodb.MongoCollection;
+import com.mongodb.MongoURI;
 import Principal.Mensaje;
 import Principal.Usuario;
 import com.mongodb.BasicDBObject;
@@ -67,16 +69,16 @@ public class MensajeDao {
   
   
     public List <Mensaje> retrieveTotal(){
-       DBCollection mensajeCol = db.getCollection("mensaje");
+       MongoCollection<Document> mensajeCol = db.getCollection("mensaje");
         
-        DBCursor cursor = mensajeCol.find();
+       MongoCursor<Document> cursor = mensajeCol.find();
    
         
         List<Mensaje> mensajes = new ArrayList<>();
          try{
             while (cursor.hasNext()){
               
-                DBObject mensajeDoc = cursor.next();
+                Document mensajeDoc = cursor.next();
                 Mensaje mensaje = new Mensaje(mensajeDoc.get("mensaje").toString(), mensajeDoc.get("termino").toString(), mensajeDoc.get("nombrePaciente").toString(),mensajeDoc.get("hora").toString());
               
                 mensajes.add(mensaje);
@@ -94,9 +96,9 @@ public class MensajeDao {
     
     public void CreateMensaje(String nombre,String mensaje,String termino){
             
-        DBCollection mensajeCol = db.getCollection("mensaje");
+        MongoCollection<Document> mensajeCol = db.getCollection("mensaje");
           Date fecha1 = new Date ();
-        DBObject mens = new BasicDBObject()
+        Document mens = new Document()
                 .append("mensaje", mensaje)
                 .append("termino", termino)
                 .append("nombrePaciente", nombre)
