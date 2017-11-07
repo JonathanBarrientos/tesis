@@ -3,15 +3,22 @@
 package Dao;
 
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.ServerAddress;
+
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+
+import org.bson.Document;
+
 import Principal.Usuario;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +26,9 @@ import java.util.List;
 
 public class UsuarioDao {
     private static UsuarioDao dao;
-   Mongo client;
-   MongoClientURI uri;
-    
-    DB db;
+   private static  MongoClient client;
+    private static MongoClientURI uri;
+    private static MongoDatabase db;
     
     
     
@@ -34,18 +40,18 @@ public class UsuarioDao {
     }
     
       private UsuarioDao() throws UnknownHostException{
-        uri  = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
-         client = new MongoClient(uri);
-         db = client.getDB("arsad");
+        uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
+        client = new MongoClient(uri);
+        db = new MongoDatabase(client.getDatabase("arsad"));
     }
       
       //Login
       public Usuario GetUsuario(String codigo, String password){
-        DBCollection usuCol = db.getCollection("usuario");
-        DBObject filtro1 = new BasicDBObject("NombreUsuario", codigo)
+        MongoCollection<Document> usuCol = db.getCollection("usuario");
+        Document filtro1 = new Document("NombreUsuario", codigo)
                 .append("contraseña", password);
           
-        DBObject usuDoc = usuCol.findOne(filtro1);
+        Document usuDoc = usuCol.findOne(filtro1);
         Usuario usuario = null;
         
         usuario= new Usuario(usuDoc.get("nombre").toString(), Integer.parseInt(usuDoc.get("edad").toString()), Integer.parseInt(usuDoc.get("dni").toString()), codigo, password, usuDoc.get("tipoUsuario").toString());
@@ -60,15 +66,15 @@ public class UsuarioDao {
       
       
       public List<Usuario> mirarClientes(){
-          DBCollection usuCol = db.getCollection("usuario");
+          MongoCollection<Document> usuCol = db.getCollection("usuario");
           List<Usuario> usuarios  = new ArrayList<>();
-           DBCursor cursor = usuCol.find();
+           MongoCollection<Document> cursor = usuCol.find();
           
           
              try{
             while (cursor.hasNext()){
               
-                DBObject usuDoc = cursor.next();
+                Document usuDoc = cursor.next();
                 if(usuDoc.get("tipoUsuario").toString().equals("paciente")){
                 Usuario usu = new Usuario(usuDoc.get("nombre").toString(), Integer.parseInt(usuDoc.get("edad").toString()), Integer.parseInt(usuDoc.get("dni").toString()));
               
@@ -90,9 +96,9 @@ public class UsuarioDao {
       
        //Registrar a un nuevo usuario 
       public void CreateUsuario(Usuario usu){
-          DBCollection usuCol = db.getCollection("usuario");
+          MongoCollection<Document> usuCol = db.getCollection("usuario");
           
-          DBObject usuDoc = new BasicDBObject()
+          Document usuDoc = new Document()
                 .append("nombre", usu.getNombre())
                 .append("edad",usu.getEdad())
                 .append("dni", usu.getDni())

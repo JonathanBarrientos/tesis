@@ -11,6 +11,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 
+import org.bson.Document;
 import com.datumbox.opensource.classifiers.NaiveBayes;
 import com.datumbox.opensource.dataobjects.NaiveBayesKnowledgeBase;
 import com.mongodb.BasicDBObject;
