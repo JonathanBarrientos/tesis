@@ -3,19 +3,16 @@ package Dao;
 
 import com.mongodb.client.MongoCursor;
 
-import com.mongodb.MongoCollection;
+
 import com.mongodb.MongoURI;
 import Principal.Mensaje;
 import Principal.Usuario;
-import com.mongodb.BasicDBObject;
 import org.bson.Document;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import java.net.UnknownHostException;
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +21,9 @@ import java.util.List;
 
 public class MensajeDao {
     private static MensajeDao dao= null;
-    private static  MongoClient client;
-    private static MongoURI uri ;
-    private static MongoDatabase db;
+    MongoClientURI uri;
+    MongoClient  client;
+  MongoDatabase db;
     
     
     
@@ -38,18 +35,19 @@ public class MensajeDao {
     }
     
       private MensajeDao() throws UnknownHostException{
-        uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
-        client = new MongoClient(uri);
-        db = new MongoDatabase(client.getDatabase("arsad"));
+          uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
+            client = new MongoClient(uri);
+          db =  client.getDatabase("arsad");
 
       }
 
       
     
   public List<Mensaje> retrievePorUsuario(Usuario usu){
+      
        MongoCollection<Document> mensajeCol = db.getCollection("mensaje");
         
-        MongoCursor<Document> cursor = mensajeCol.find();
+        MongoCursor<Document> cursor =mensajeCol.find().iterator();
         
         List<Mensaje> mensajes = new ArrayList<>();
          try{
@@ -69,16 +67,17 @@ public class MensajeDao {
   
   
     public List <Mensaje> retrieveTotal(){
+        
        MongoCollection<Document> mensajeCol = db.getCollection("mensaje");
         
-       MongoCursor<Document> cursor = mensajeCol.find();
+       MongoCursor<Document> cursor = mensajeCol.find().iterator();
    
         
         List<Mensaje> mensajes = new ArrayList<>();
          try{
             while (cursor.hasNext()){
               
-                Document mensajeDoc = cursor.next();
+                Document mensajeDoc = cursor .next();
                 Mensaje mensaje = new Mensaje(mensajeDoc.get("mensaje").toString(), mensajeDoc.get("termino").toString(), mensajeDoc.get("nombrePaciente").toString(),mensajeDoc.get("hora").toString());
               
                 mensajes.add(mensaje);
@@ -104,7 +103,7 @@ public class MensajeDao {
                 .append("nombrePaciente", nombre)
                 .append("hora", fecha1.toLocaleString());
         
-        mensajeCol.insert(mens);
+        mensajeCol.insertOne(mens);
     }
     
   

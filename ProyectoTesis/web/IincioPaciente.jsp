@@ -22,7 +22,7 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="css/Incio.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
- //   @import url(http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css);
+
 
 
     </style>

@@ -26,9 +26,9 @@ import java.util.Map;
 
 public class TerminoDao {
     private static TerminoDao dao= null;
-    private static  MongoClient client;
-    private static MongoClientURI uri;
-    private static MongoDatabase db;
+     MongoClient client;
+     MongoClientURI uri;
+        MongoDatabase db;
     
     
     public static TerminoDao getInstance() throws UnknownHostException{
@@ -43,7 +43,7 @@ public class TerminoDao {
      //    db = client.getDB("clinica");
         uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
         client = new MongoClient(uri);
-        db = new MongoDatabase(client.getDatabase("arsad"));
+        db = client.getDatabase("arsad");
 
       }
     
@@ -54,7 +54,7 @@ public class TerminoDao {
           
            Map<String, String[]> trainingFiles = new HashMap<>();
            MongoCollection<Document> terminoCol = db.getCollection("terminos");
-           MongoCursor<Document> cursor= terminoCol.find();
+           MongoCursor<Document> cursor= terminoCol.find().iterator();
            String term;
            
             try{
@@ -94,7 +94,7 @@ public class TerminoDao {
                 .append("categoriaTiempo", tiempo)
                 .append("categoriaDolor",dolor);
            
-           terminoCol.insert(ter);
+           terminoCol.insertOne(ter);
           
       }
 }

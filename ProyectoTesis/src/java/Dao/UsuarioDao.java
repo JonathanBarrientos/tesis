@@ -2,22 +2,17 @@
 
 package Dao;
 
-
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.ServerAddress;
-
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 
 import org.bson.Document;
-
 import Principal.Usuario;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 
-import com.mongodb.Mongo;
+
+
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -28,7 +23,7 @@ public class UsuarioDao {
     private static UsuarioDao dao;
    private static  MongoClient client;
     private static MongoClientURI uri;
-    private static MongoDatabase db;
+      MongoDatabase db;
     
     
     
@@ -42,7 +37,7 @@ public class UsuarioDao {
       private UsuarioDao() throws UnknownHostException{
         uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
         client = new MongoClient(uri);
-        db = new MongoDatabase(client.getDatabase("arsad"));
+        db =  client.getDatabase("arsad");
     }
       
       //Login
@@ -51,7 +46,7 @@ public class UsuarioDao {
         Document filtro1 = new Document("NombreUsuario", codigo)
                 .append("contraseña", password);
           
-        Document usuDoc = usuCol.findOne(filtro1);
+        Document usuDoc = usuCol.find(filtro1).first();
         Usuario usuario = null;
         
         usuario= new Usuario(usuDoc.get("nombre").toString(), Integer.parseInt(usuDoc.get("edad").toString()), Integer.parseInt(usuDoc.get("dni").toString()), codigo, password, usuDoc.get("tipoUsuario").toString());
@@ -68,11 +63,11 @@ public class UsuarioDao {
       public List<Usuario> mirarClientes(){
           MongoCollection<Document> usuCol = db.getCollection("usuario");
           List<Usuario> usuarios  = new ArrayList<>();
-           MongoCollection<Document> cursor = usuCol.find();
+          MongoCursor<Document> cursor =  usuCol.find().iterator();
           
           
-             try{
-            while (cursor.hasNext()){
+         try{
+            while(cursor.hasNext()){
               
                 Document usuDoc = cursor.next();
                 if(usuDoc.get("tipoUsuario").toString().equals("paciente")){
@@ -108,7 +103,7 @@ public class UsuarioDao {
                 
              
         
-        usuCol.insert(usuDoc);
+        usuCol.insertOne(usuDoc);
       
       }
       

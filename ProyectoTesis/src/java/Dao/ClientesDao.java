@@ -13,7 +13,8 @@ import org.bson.Document;
 import Principal.Usuario;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
+
+import com.mongodb.client.MongoCursor;
 
 
 import java.net.UnknownHostException;
@@ -23,9 +24,9 @@ import java.util.List;
 public class ClientesDao {
     
     private static ClientesDao dao= null;
-    private static  MongoClient client;
-    private static MongoClientURI uri;
-    private static MongoDatabase db;
+     MongoClient client;
+   MongoClientURI uri;
+    MongoDatabase db;
     
     
     public static ClientesDao getInstance() throws UnknownHostException{
@@ -40,7 +41,7 @@ public class ClientesDao {
      //    db = client.getDB("clinica");
         uri = new MongoClientURI("mongodb://myzrael:myzrael456@ds131854.mlab.com:31854/arsad");
         client = new MongoClient(uri);
-        db = new MongoDatabase(client.getDatabase("arsad"));
+         db =  client.getDatabase("arsad");
 
 
       }
@@ -50,7 +51,7 @@ public class ClientesDao {
    public List<Usuario> retrieve(){
         MongoCollection<Document> clienteCol = db.getCollection("usuario");
         
-        MongoCursor<Document> cursor = clienteCol.find();
+        MongoCursor<Document> cursor = clienteCol.find().iterator();
         List<Usuario> clientes = new ArrayList<Usuario>();
         try{
             while (cursor.hasNext()){
